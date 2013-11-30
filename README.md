@@ -42,7 +42,9 @@ def snow_cover(modis_file, \
     #vector mask
     sys.path.insert(0,'files/python')
     from raster_mask import *
-    m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\attribute_filter=2)
+    m = raster_mask2(fname,\
+                target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
+                attribute_filter=2)
     
     
 plt.imshow(m)
