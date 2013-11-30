@@ -5,6 +5,7 @@ Data-Download
 
 import gdal
 import numpy as np
+import numpy.ma as ma
 
 #for one file:
 modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
@@ -28,7 +29,10 @@ for i,layer in enumerate(data_layers):
 snow_cover = data['Fractional_Snow_Cover']
 qa = data['Snow_Spatial_QA']
 
-
+np.unique(qa)
+qa = qa & 1
+cloud_mask = np.ma.array ( snow_cover, mask=qa )
+#masked data showing only 'good quality' data, clouds represent the bad quality data
 
 #Discharge Data
 #Reading the data invloved using the 'Save as' function in the browser
@@ -48,6 +52,11 @@ year,doy = datetime.datetime(ds[0],ds[1],ds[2]).strftime('%Y %j').split()
 #Reading the data invloved using the 'Save as' function in the browser
 
 
+#Boundary Data
 
+import sys
+sys.path.insert(0,'files/python')
+from raster_mask import *
+m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\attribute_filter=2)
 
 
