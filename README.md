@@ -3,36 +3,51 @@ Data-Download
 
 #MODIS Snow Cover Data
 
+import sys
 import gdal
 import numpy as np
 import numpy.ma as ma
 
-#for one file:
+#for one file, (needs changing using a common name for all files)
 modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
 target_vector_file = file
 g = gdal.Open(modis_file)
+#using gdal to open the image file and the datasets that it contains
 
+#pull subdatasets from each image hdf file
 subdatasets = g.GetSubDatasets()
 for fname, name in subdatasets:
     print name
     print "\t", fname
     
-data_layers = [ "Fractional_Snow_Cover" , "Snow_Spatial_QA" ]
-file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
-    
-data ={}
-for i,layer in enumerate(data_layers):
-    this_file = file_template % (modis_file, layer)
-    g = gdal.Open(this_file)
-    data[layer] = g.ReadAsArray()
-    
-snow_cover = data['Fractional_Snow_Cover']
-qa = data['Snow_Spatial_QA']
+def snow_cover(modis_file, \qa_layer = 'Snow_Spatial_QA', \data_layer = [ "Fractional_Snow_Cover" ]):
+    data_layer.append(qa_layer)
+    file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
+    data = {}
+    for i,layer in enumerate(data_layer):
+        this_file = file_template % (modis_file, layer)
+        g = gdal.Open(this_file)
+        data[layer] = g.ReadAsArray()
+    qa = data[qa_layer] #Quality Assurance data is pulled
+    #find bit 0
+    qa = qa & 1 
+    odata = {}
+    for layer in data_layer[]: #syntax here may be a problem
+        odata[layer] = ma.array (data[layer],mask=qa)
+    fname = 'HDF4_EOS:EOS_GRID:"%s":%s'%(modis_file,data_layer)
 
-np.unique(qa)
-qa = qa & 1
-cloud_mask = np.ma.array ( snow_cover, mask=qa )
-#masked data showing only 'good quality' data, clouds represent the bad quality data
+
+#Vector mask
+
+import sys
+sys.path.insert(0,'files/python')
+from raster_mask import *
+m = raster_mask2(fname,\
+                target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
+                attribute_filter=2)
+plt.imshow(m)
+plt.colorbar()
+
 
 #Discharge Data
 #Reading the data invloved using the 'Save as' function in the browser
@@ -58,5 +73,9 @@ import sys
 sys.path.insert(0,'files/python')
 from raster_mask import *
 m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\attribute_filter=2)
+
+
+
+#Full code
 
 
