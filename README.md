@@ -69,6 +69,10 @@ year,doy = datetime.datetime(ds[0],ds[1],ds[2]).strftime('%Y %j').split()
 #Temperature Data
 #Reading the data invloved using the 'Save as' function in the browser
 
+file = 'files/data/delNorteT.dat'
+fp = open(file, 'r')
+sdata = fp.readlines()
+
 
 #Boundary Data
 
