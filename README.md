@@ -4,6 +4,7 @@ Data-Download
 #MODIS Snow Cover Data
 
 import gdal
+import numpy as np
 
 #for one file:
 modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
@@ -15,13 +16,17 @@ for fname, name in subdatasets:
     print name
     print "\t", fname
     
+data_layers = [ "Fractional_Snow_Cover" , "Snow_Spatial_QA" ]
 file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
     
-data_layer = 'MOD_Grid_Snow_500m:Fractional_Snow_Cover'
-
 data ={}
-for i,layer in enumerate(data_layer):
+for i,layer in enumerate(data_layers):
     this_file = file_template % (modis_file, layer)
+    g = gdal.Open(this_file)
+    data[layer] = g.ReadAsArray()
+    
+snow_cover = data['Fractional_Snow_Cover']
+qa = data['Snow_Spatial_QA']
 
 
 
