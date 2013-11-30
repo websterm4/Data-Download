@@ -7,6 +7,7 @@ import sys
 import gdal
 import numpy as np
 import numpy.ma as ma
+from osgeo import ogr,osr
 
 #for one file, (needs changing using a common name for all files)
 modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
@@ -20,7 +21,9 @@ for fname, name in subdatasets:
     print name
     print "\t", fname
     
-def snow_cover(modis_file, \qa_layer = 'Snow_Spatial_QA', \data_layer = [ "Fractional_Snow_Cover" ]):
+def snow_cover(modis_file, \
+           qa_layer = 'Snow_Spatial_QA',\
+           data_layer = ["Fractional_Snow_Cover"]):
     data_layer.append(qa_layer)
     file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
     data = {}
@@ -32,21 +35,19 @@ def snow_cover(modis_file, \qa_layer = 'Snow_Spatial_QA', \data_layer = [ "Fract
     #find bit 0
     qa = qa & 1 
     odata = {}
-    for layer in data_layer[]: #syntax here may be a problem
+    for layer in data_layer: #syntax here may be a problem
         odata[layer] = ma.array (data[layer],mask=qa)
+    return odata
     fname = 'HDF4_EOS:EOS_GRID:"%s":%s'%(modis_file,data_layer)
-
-
-#Vector mask
-
-import sys
-sys.path.insert(0,'files/python')
-from raster_mask import *
-m = raster_mask2(fname,\
-                target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
-                attribute_filter=2)
+    #vector mask
+    sys.path.insert(0,'files/python')
+    from raster_mask import *
+    m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\attribute_filter=2)
+    
+    
 plt.imshow(m)
 plt.colorbar()
+
 
 
 #Discharge Data
