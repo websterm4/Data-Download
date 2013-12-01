@@ -103,6 +103,15 @@ for line in data:
     
 
     
+newtemp_data = []
+for line in data:
+    if (line.startswith("2009")) and (line.startswith("2010"):
+        newtemp_data.append(temp_data)
+        
+
+        
+        
+    
 [[[[[[#FLAG - #convert data to float
     for column,this_element in enumerate(day_data):
         day_data[column] = float(this_element)  ]]]]]]
