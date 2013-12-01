@@ -21,12 +21,13 @@ for fname, name in subdatasets:
     print name
     print "\t", fname
     
+data = {}
+    
 def snow_cover(modis_file, \
            qa_layer = 'Snow_Spatial_QA',\
            data_layer = ["Fractional_Snow_Cover"]):
     data_layer.append(qa_layer)
     file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
-    data = {}
     for i,layer in enumerate(data_layer):
         this_file = file_template % (modis_file, layer)
         g = gdal.Open(this_file)
@@ -71,8 +72,21 @@ year,doy = datetime.datetime(ds[0],ds[1],ds[2]).strftime('%Y %j').split()
 
 file = 'files/data/delNorteT.dat'
 fp = open(file, 'r')
-sdata = fp.readlines()
+tdata = fp.readlines()
+fp.close()
+required_data = tdata[2:]
+#read the data in and chop off first two lines - header and white space
 
+data = []
+#set up list to store data
+line_data = '2000  1  1   44    8    0    0    0\n'
+day_data = line_data.split()
+for line_data in required_data: #loop over each line
+    day_data = line_data.split() #strings split on the white space
+    #convert data to float
+    for column,this_element in enumerate(day_data):
+        day_data[column] = float(this_element)
+    data.append(day_data)
 
 #Boundary Data
 
