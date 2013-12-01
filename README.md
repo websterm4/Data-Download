@@ -80,13 +80,15 @@ required_data = tdata[2:]
 data = []
 #set up list to store data
 line_data = '2000  1  1   44    8    0    0    0\n'
-day_data = line_data.split()
+
 for line_data in required_data: #loop over each line
     day_data = line_data.split() #strings split on the white space
     #convert data to float
     for column,this_element in enumerate(day_data):
         day_data[column] = float(this_element)
     data.append(day_data)
+
+newday_data = day_data[0:5]
 
 #Boundary Data
 
@@ -96,7 +98,5 @@ from raster_mask import *
 m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\attribute_filter=2)
 
 
-
-#Full code
 
 
