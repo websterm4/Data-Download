@@ -4,10 +4,14 @@ Data-Download
 #MODIS Snow Cover Data
 
 import sys
+sys.path.insert(0,'files/python')
 import gdal
 import numpy as np
 import numpy.ma as ma
+from raster_mask import raster_mask
+import os
 from osgeo import ogr,osr
+import pylab as plt
 
 #for one file, (needs changing using a common name for all files)
 modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
@@ -39,17 +43,26 @@ def snow_cover(modis_file, \
     for layer in data_layer: #syntax here may be a problem
         odata[layer] = ma.array (data[layer],mask=qa)
     return odata
-    fname = 'HDF4_EOS:EOS_GRID:"%s":%s'%(modis_file,data_layer)
+    
+    
     #vector mask
-    sys.path.insert(0,'files/python')
-    from raster_mask import *
-    m = raster_mask2(fname,\
+    
+    from raster_mask import raster_mask
+    fname = 'HDF4_EOS:EOS_GRID:"%s":%s'%(modis_file,data_layer)
+    mask = raster_mask2(fname,\
                 target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
                 attribute_filter=2)
-    
-    
-plt.imshow(m)
-plt.colorbar()
+    plt.imshow(mask)
+    plt.colorbar()
+
+rowpix,colpix = np.where(mask == False)
+mincol,maxcol = min(colpix),max(colpix)
+minrow,maxrow = min(rowpix),max(rowpix)
+ncol = maxcol - mincol + 1
+nrow = maxrow - minrow + 1
+small_mask = mask[minrow:minrow+nrow,mincol:mincol+ncol]
+
+
 
 
 
@@ -79,16 +92,21 @@ required_data = tdata[2:]
 
 data = []
 #set up list to store data
-line_data = '2000  1  1   44    8    0    0    0\n'
 
 for line_data in required_data: #loop over each line
     day_data = line_data.split() #strings split on the white space
-    #convert data to float
-    for column,this_element in enumerate(day_data):
-        day_data[column] = float(this_element)
     data.append(day_data)
+print data[0][0]
+temp_data = []
+for line in data:
+    temp_data.append(line[0:-3])
+    
 
-newday_data = day_data[0:5]
+    
+[[[[[[#FLAG - #convert data to float
+    for column,this_element in enumerate(day_data):
+        day_data[column] = float(this_element)  ]]]]]]
+
 
 #Boundary Data
 
