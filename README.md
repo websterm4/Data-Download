@@ -24,12 +24,14 @@ subdatasets = g.GetSubDatasets()
 for fname, name in subdatasets:
     print name
     print "\t", fname
+
+[[[FLAG- print parts not needed in final code]]]]
     
 data = {}
     
 def snow_cover(modis_file, \
-           qa_layer = 'Snow_Spatial_QA',\
-           data_layer = ["Fractional_Snow_Cover"]):
+                          qa_layer = 'Snow_Spatial_QA', \
+                          data_layer = ["Fractional_Snow_Cover"]):
     data_layer.append(qa_layer)
     file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
     for i,layer in enumerate(data_layer):
@@ -100,11 +102,15 @@ print data[0][0]
 temp_data = []
 for line in data:
     temp_data.append(line[0:-3])
+#years are defined
+years = '2009' and '2010'
+for line in temp_data:
+    np.where(years)
     
 
     
 newtemp_data = []
-for line in data:
+for line in temp_data:
     if (line.startswith("2009")) and (line.startswith("2010"):
         newtemp_data.append(temp_data)
         
