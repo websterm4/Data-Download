@@ -180,6 +180,8 @@ import pylab as plt
 #from modis_prepration import read_snow
 #from raster_mask import raster_mask, getread_snow_cover
 
+#year = '   '
+
 modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/*.hdf')
 
 def read_snow(modis_files):
@@ -195,6 +197,7 @@ def read_snow(modis_files):
     #Vector mask applied
     this_file = file_template % (modis_files, layer)
     #code for mask is taken directly from course notes
+    shp = ogr.Open("files/data/Hydrologic_Units/HUC_Polygons.shp")
     mask = raster_mask2(this_file,\
                 target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
                 attribute_filter=2)
