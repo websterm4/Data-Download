@@ -132,4 +132,30 @@ m = raster_mask2(fname,\target_vector_file="files/data/Hydrologic_Units/HUC_Poly
 
 
 
+New MODIS SNow Cover Code
+modis_file = 'MOD10A1.A2009001.h09v05.005.2009009120443.hdf'
+target_vector_file = file
+g = gdal.Open(modis_file)
+subdatasets = g.GetSubDatasets()
+for fname, name in subdatasets:
+    print name
+    print "\t", fname
+data = {}
+data_layers = ["Snow_Cover_Daily_Tile","Snow_Spatial_QA"]
+file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
+for i,layer in enumerate(data_layers):
+        this_file = file_template % (modis_file, layer)
+        g = gdal.Open(this_file)
+        data[layer] = g.ReadAsArray()
+snow = data['Snow_Cover_Daily_Tile']
+plt.imshow(snow)
+plt.colorbar()
+qc = data['Snow_Spatial_QA']
+
+
+
+
+
+
+
 
