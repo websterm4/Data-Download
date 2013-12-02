@@ -177,11 +177,12 @@ from glob import glob
 import os
 from osgeo import ogr,osr
 import pylab as plt
-#from modis_prepration import read_snow_cover
+#from modis_prepration import read_snow
+#from raster_mask import raster_mask, getread_snow_cover
 
 modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/*.hdf')
 
-def read_snow_cover(modis_files):
+def read_snow(modis_files):
     g = gdal.Open(modis_files)
     subdatasets = g.GetSubDatasets()
     data_layers = [ "Fractional_Snow_Cover", "Snow_Spatial_QA" ]
@@ -207,11 +208,15 @@ def read_snow_cover(modis_files):
     valid_mask = (snow > 100)
     return ma.array(snow,mask=valid_mask)
     
+    #test: test_snow = read_snow(modis_files[0])
+    
 #loop for all images
 modis_snow = []
 for f in modis_files:
-    modis_snow.append(read_snow_cover(f))
-read_snow_cover = np.ma.array(read_snow_cover)
+    modis_snow.append(read_snow(f))
+#Neater way of presenting this
+modis_snow = ma.array([read_snow(f) for f in modis_files)]
+print modis_snow.shape
 
 
 
