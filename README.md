@@ -8,8 +8,8 @@ sys.path.insert(0,'files/python')
 import gdal
 import numpy as np
 import numpy.ma as ma
-from raster_mask import raster_mask
-import glob
+from raster_mask import *
+from glob import glob
 import os
 from osgeo import ogr,osr
 import pylab as plt
@@ -157,31 +157,63 @@ qa = qa & 1
 qa_mask = np.ma.array ( snow, mask=qa )
 
 
-years = '2009' and '2010'
-sensors = 'MOD10A1' and 'MYD10A1'
-modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/%s.A%d*.h09v05.*.hdf'%(sensors,years))
 
-def snow_cover(modis_files):
-    g = gdal.Open(modis_file)
+
+
+
+
+
+
+#MAIN CODE
+
+
+import sys
+sys.path.insert(0,'files/python')
+import gdal
+import numpy as np
+import numpy.ma as ma
+from raster_mask import *
+from glob import glob
+import os
+from osgeo import ogr,osr
+import pylab as plt
+#from modis_prepration import read_snow_cover
+
+modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/*.hdf')
+
+def read_snow_cover(modis_files):
+    g = gdal.Open(modis_files)
     subdatasets = g.GetSubDatasets()
     data_layers = [ "Fractional_Snow_Cover", "Snow_Spatial_QA" ]
     data = {}
     file_template = 'HDF4_EOS:EOS_GRID:"%s":MOD_Grid_Snow_500m:%s'
     for i,layer in enumerate(data_layers):
-        this_file = file_template % (modis_file, layer)
+        this_file = file_template % (modis_files, layer)
         g = gdal.Open(this_file)
         data[layer] = g.ReadAsArray()
+    #Vector mask applied
+    this_file = file_template % (modis_files, layer)
+    #code for mask is taken directly from course notes
+    mask = raster_mask2(this_file,\
+                target_vector_file="files/data/Hydrologic_Units/HUC_Polygons.shp",\
+                attribute_filter=2)
+    data['Fractional_Snow_Cover'] = ma.array(data['Fractional_Snow_Cover'],mask=mask)
+    data['Snow_Spatial_QA'] = ma.array(data['Snow_Spatial_QA'],mask=mask)
     snow = data['Fractional_Snow_Cover']
     qa = data['Snow_Spatial_QA']
     qa = qa & 1
     qa_mask = np.ma.array ( snow, mask=qa )
-    return qa_mask
+    #return qa_mask?
+    valid_mask = (snow > 100)
+    return ma.array(snow,mask=valid_mask)
     
 #loop for all images
 modis_snow = []
 for f in modis_files:
-    modis_snow.append(snow_cover(f))
-snow_cover = np.ma.array(snow_cover)
+    modis_snow.append(read_snow_cover(f))
+read_snow_cover = np.ma.array(read_snow_cover)
+
+
 
 
 
