@@ -182,7 +182,7 @@ import pylab as plt
 
 #year = '   '
 
-modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/*.hdf')
+modis_files = np.sort(glob.glob('files/data/MODIS_Snow_Data/*.hdf'))
 
 def read_snow(modis_files):
     g = gdal.Open(modis_files)
